@@ -331,7 +331,7 @@ namespace asgn5v1
 		protected override void OnPaint(PaintEventArgs pea)
 		{
 			Graphics grfx = pea.Graphics;
-         Pen pen = new Pen(Color.White, 3);
+            Pen pen = new Pen(Color.White, 3);
 			double temp;
 			int k;
 
@@ -350,6 +350,8 @@ namespace asgn5v1
                         scrnpts[i, j] = temp;
                     }
                 }
+
+                scrnpts = multMatrices(scrnpts, scrnpts);
 
                 //now draw the lines
 
@@ -485,6 +487,30 @@ namespace asgn5v1
 		{
 			
 		}
+
+        private double[,] reflect(double[,] m) {
+            double[,] result = new double[m.Length,m.GetLength(0)];
+
+
+
+            return result;
+        }
+
+        private double[,] multMatrices(double[,] m1, double[,] m2) {
+            double[,] result = new double[m1.Length,m2.GetLength(0)];
+            int k;
+            double temp;
+            for (int i = 0; i < numpts; i++) {
+                for (int j = 0; j < 4; j++) {
+                    temp = 0.0d;
+                    for (k = 0; k < 4; k++)
+                        temp += m1[i, k] * m2[k, j];
+                    result[i, j] = temp;
+                }
+            }
+            return result;
+
+        }
 
 		private void toolBar1_ButtonClick(object sender, System.Windows.Forms.ToolBarButtonClickEventArgs e)
 		{
