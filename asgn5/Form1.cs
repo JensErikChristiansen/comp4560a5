@@ -355,12 +355,10 @@ namespace asgn5v1
                 double xOffset = vertices[0, 0];
                 double yOffset = vertices[0, 1];
                 double[,] tempTrans = new double[4, 4];
-                tempTrans = initArray(tempTrans);
                 tempTrans = translate(xOffset * -1, yOffset * -1);
                 tempTrans = multTransformMatrices(tempTrans, scale(20, 20));
                 tempTrans = multTransformMatrices(tempTrans, reflect(ReflectionAxis.X));
                 tempTrans = multTransformMatrices(tempTrans, translate(ClientRectangle.Width / 2, ClientRectangle.Height / 2));
-
 
                 scrnpts = multMatrices(scrnpts, tempTrans);
                 
@@ -398,6 +396,8 @@ namespace asgn5v1
 
 		void RestoreInitialImage()
 		{
+            scrnpts = vertices;
+            ctrans = initArray();
 			Invalidate();
 		} // end of RestoreInitialImage
 
@@ -506,9 +506,8 @@ namespace asgn5v1
 		}
 
         private double[,] reflect(ReflectionAxis axis) {
-            double[,] result = new double[4, 4];
 
-            result = initArray(result);
+            double[,] result = initArray();
 
             switch (axis)
             {
@@ -528,8 +527,9 @@ namespace asgn5v1
             return result;
         }
 
-        private double[,] initArray(double[,] array)
+        private double[,] initArray()
         {
+            double[,] array = new double[4,4];
             array[0, 0] = 1;
             array[1, 1] = 1;
             array[2, 2] = 1;
@@ -540,8 +540,7 @@ namespace asgn5v1
 
         private double[,] scale(double xFactor, double yFactor, double zFactor = 1)
         {
-            double[,] result = new double[4, 4];
-            result = initArray(result);
+            double[,] result = initArray();
 
             result[0, 0] *= xFactor;
             result[1, 1] *= yFactor;
@@ -553,10 +552,8 @@ namespace asgn5v1
 
         private double[,] translate(double xOffset, double yOffset, double zOffset = 0)
         {
-            double[,] result = new double[4, 4];
+            double[,] result = initArray();
 
-            result = initArray(result);
-            
             result[3, 0] += xOffset;
             result[3, 1] += yOffset;
             result[3, 2] += zOffset;
@@ -613,16 +610,20 @@ namespace asgn5v1
 			}
 			if (e.Button == transupbtn)
 			{
+                ctrans = multTransformMatrices(ctrans, translate(0, 10));
 				Refresh();
 			}
 			
 			if(e.Button == transdownbtn)
 			{
-				Refresh();
+                ctrans = multTransformMatrices(ctrans, translate(0, -10));
+                Refresh();
 			}
 			if (e.Button == scaleupbtn) 
 			{
-				Refresh();
+                
+                ctrans = multTransformMatrices(ctrans, scale(2, 2));
+                Refresh();
 			}
 			if (e.Button == scaledownbtn) 
 			{
