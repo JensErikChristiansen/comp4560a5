@@ -354,14 +354,15 @@ namespace asgn5v1
                 // find center of shape
                 double xOffset = vertices[0, 0];
                 double yOffset = vertices[0, 1];
-                ctrans = multTransformMatrices(ctrans, translate(xOffset * -1, yOffset * -1));
-                ctrans = multTransformMatrices(ctrans, scale(20, 20));
-                ctrans = multTransformMatrices(ctrans, reflect(ReflectionAxis.X));
+                double[,] tempTrans = new double[4, 4];
+                tempTrans = initArray(tempTrans);
+                tempTrans = translate(xOffset * -1, yOffset * -1);
+                tempTrans = multTransformMatrices(tempTrans, scale(20, 20));
+                tempTrans = multTransformMatrices(tempTrans, reflect(ReflectionAxis.X));
+                tempTrans = multTransformMatrices(tempTrans, translate(ClientRectangle.Width / 2, ClientRectangle.Height / 2));
 
 
-
-                //ctrans = multTransformMatrices(ctrans, translate(ClientRectangle.Width / 2, ClientRectangle.Height / 2));
-                scrnpts = multMatrices(scrnpts, ctrans);
+                scrnpts = multMatrices(scrnpts, tempTrans);
                 
 
 
@@ -419,7 +420,9 @@ namespace asgn5v1
 				} while (text != null);
 				reader.Close();
 				DecodeCoords(coorddata);
-			}
+                
+
+            }
 			else
 			{
 				MessageBox.Show("***Failed to Open Coordinates File***");
@@ -466,10 +469,12 @@ namespace asgn5v1
 				vertices[numpts,3] = 1.0d;
 				numpts++;						
 			}
-			
-		}// end of DecodeCoords
 
-		void DecodeLines(ArrayList linesdata)
+            
+
+        }// end of DecodeCoords
+
+        void DecodeLines(ArrayList linesdata)
 		{
 			//this may allocate slightly more rows that necessary
 			lines = new int[linesdata.Count,2];
@@ -579,7 +584,7 @@ namespace asgn5v1
         }
 
         private double[,] multMatrices(double[,] m1, double[,] m2) {
-            double[,] result = new double[m1.Length,m2.GetLength(0)];
+            double[,] result = new double[m1.GetLength(0),m1.GetLength(1)];
             int k;
             double temp;
             for (int i = 0; i < numpts; i++) {
@@ -598,7 +603,8 @@ namespace asgn5v1
 		{
 			if (e.Button == transleftbtn)
 			{
-				Refresh();
+                ctrans = multTransformMatrices(ctrans, translate(-10, 0));
+                Refresh();
 			}
 			if (e.Button == transrightbtn) 
 			{
