@@ -14,6 +14,7 @@ namespace asgn5v1
 	/// </summary>
 	public class Transformer : System.Windows.Forms.Form
 	{
+        private enum ReflectionAxis { X, Y, Z }
 		private System.ComponentModel.IContainer components;
 		//private bool GetNewData();
 
@@ -77,8 +78,7 @@ namespace asgn5v1
 				new EventHandler(MenuAboutOnClick));
 			Menu = new MainMenu(new MenuItem[] {miFile, miAbout});
 
-			
-		}
+        }
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -351,7 +351,19 @@ namespace asgn5v1
                     }
                 }
 
-                scrnpts = multMatrices(scrnpts, scrnpts);
+                // find center of shape
+                double xOffset = vertices[0, 0];
+                double yOffset = vertices[0, 1];
+                ctrans = multTransformMatrices(ctrans, translate(xOffset * -1, yOffset * -1));
+                ctrans = multTransformMatrices(ctrans, scale(20, 20));
+                ctrans = multTransformMatrices(ctrans, reflect(ReflectionAxis.X));
+
+
+
+                //ctrans = multTransformMatrices(ctrans, translate(ClientRectangle.Width / 2, ClientRectangle.Height / 2));
+                scrnpts = multMatrices(scrnpts, ctrans);
+                
+
 
                 //now draw the lines
 
@@ -488,12 +500,82 @@ namespace asgn5v1
 			
 		}
 
-        private double[,] reflect(double[,] m) {
-            double[,] result = new double[m.Length,m.GetLength(0)];
+        private double[,] reflect(ReflectionAxis axis) {
+            double[,] result = new double[4, 4];
 
+            result = initArray(result);
 
+            switch (axis)
+            {
+                case ReflectionAxis.X:
+                    result[1, 1] = -1;
+                    break;
+                case ReflectionAxis.Y:
+                    result[0, 0] = -1;
+                    break;
+                case ReflectionAxis.Z:
+                    result[2, 2] = -1;
+                    break;
+                default:
+                    break;
+            }
 
             return result;
+        }
+
+        private double[,] initArray(double[,] array)
+        {
+            array[0, 0] = 1;
+            array[1, 1] = 1;
+            array[2, 2] = 1;
+            array[3, 3] = 1;
+
+            return array;
+        }
+
+        private double[,] scale(double xFactor, double yFactor, double zFactor = 1)
+        {
+            double[,] result = new double[4, 4];
+            result = initArray(result);
+
+            result[0, 0] *= xFactor;
+            result[1, 1] *= yFactor;
+            result[2, 2] *= zFactor;
+
+            return result;
+
+        }
+
+        private double[,] translate(double xOffset, double yOffset, double zOffset = 0)
+        {
+            double[,] result = new double[4, 4];
+
+            result = initArray(result);
+            
+            result[3, 0] += xOffset;
+            result[3, 1] += yOffset;
+            result[3, 2] += zOffset;
+
+            return result;
+        }
+
+        private double[,] multTransformMatrices(double[,] m1, double[,] m2)
+        {
+            double[,] result = new double[4, 4];
+            int k;
+            double temp;
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    temp = 0.0d;
+                    for (k = 0; k < 4; k++)
+                        temp += m1[i, k] * m2[k, j];
+                    result[i, j] = temp;
+                }
+            }
+            return result;
+
         }
 
         private double[,] multMatrices(double[,] m1, double[,] m2) {
@@ -520,7 +602,8 @@ namespace asgn5v1
 			}
 			if (e.Button == transrightbtn) 
 			{
-				Refresh();
+                ctrans = multTransformMatrices(ctrans, translate(10, 0));
+                Refresh();
 			}
 			if (e.Button == transupbtn)
 			{
