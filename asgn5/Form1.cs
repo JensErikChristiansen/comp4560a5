@@ -621,8 +621,11 @@ namespace asgn5v1
 			}
 			if (e.Button == scaleupbtn) 
 			{
-                
+                double xOffset = scrnpts[0, 0];
+                double yOffset = scrnpts[0, 1];
+                ctrans = multTransformMatrices(ctrans, translate(xOffset * -1, yOffset * -1));
                 ctrans = multTransformMatrices(ctrans, scale(2, 2));
+                ctrans = multTransformMatrices(ctrans, translate(xOffset, yOffset));
                 Refresh();
 			}
 			if (e.Button == scaledownbtn) 
